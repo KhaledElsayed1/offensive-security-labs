@@ -70,11 +70,7 @@ The vulnerability existed due to:
 
 ## Evidence
 
-### Injection Request
-![Injection Request](01-request.jpg)
 
-### Application Response
-![Application Response](02-response.jpg)
 
 ---
 
