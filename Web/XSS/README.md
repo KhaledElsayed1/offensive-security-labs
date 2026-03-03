@@ -1,107 +1,206 @@
-# Reflected Cross-Site Scripting (XSS)
+# Cross-Site Scripting (XSS)
 
-## Executive Summary
+## Overview
 
-During authorized security testing, a Reflected XSS vulnerability was identified in a web application where user-supplied input was reflected into the HTTP response without proper contextual encoding.
+Cross-Site Scripting (XSS) is a client-side injection vulnerability that allows an attacker to execute arbitrary JavaScript in a victim’s browser within the trusted context of a web application.
 
-This allowed arbitrary JavaScript execution in the victim's browser within the application’s trust boundary.
+XSS occurs when an application includes untrusted data in a web page without proper validation or contextual output encoding.
 
----
+XSS is classified under:
 
-## Technical Breakdown
-
-The vulnerable endpoint reflects user-controlled parameters directly inside the HTML response.
-
-The application fails to:
-
-- Encode user input before rendering
-- Sanitize special characters
-- Implement effective CSP restrictions
-
-Payloads were successfully executed in the browser context, confirming client-side code injection capability.
-
-### Example Payload Classes
-
-- Script injection
-- Event handler injection
-- SVG-based execution
-- HTML context breaking
-
-Execution was confirmed via controlled JavaScript proof-of-execution.
+- **OWASP Top 10 – A03: Injection**
+- **CWE-79: Improper Neutralization of Input During Web Page Generation**
 
 ---
 
-## Attack Flow
+# Types of XSS
 
-1. Identify reflected parameter.
-2. Inject JavaScript payload.
-3. Craft malicious URL.
-4. Victim loads URL.
-5. Browser executes injected code in authenticated context.
+XSS vulnerabilities are generally categorized into three main types:
 
----
-
-## Security Impact Analysis
-
-Depending on session configuration and application design, exploitation could enable:
-
-- Session hijacking (if cookies not HttpOnly)
-- Token exfiltration via DOM access
-- Unauthorized actions via DOM manipulation
-- Phishing overlays inside trusted origin
-- Account takeover (in chained scenarios)
-- Stored attack pivot (if reflected into stored workflow)
-
-Severity varies based on:
-
-- User privilege level
-- CSP configuration
-- SameSite cookie policy
-- Presence of CSRF protections
+1. Reflected XSS
+2. Stored XSS
+3. DOM-Based XSS
 
 ---
 
-## Risk Classification
+## 1️⃣ Reflected XSS
 
-- **OWASP Top 10:** A03 – Injection
-- **CWE-79:** Improper Neutralization of Input During Web Page Generation
-- **Likely CVSS:** Medium–High (context dependent)
+### Definition
+
+Reflected XSS occurs when user input is immediately returned (reflected) in the HTTP response without proper sanitization.
+
+The malicious payload is not stored on the server. Instead, it is embedded in a crafted request (usually via URL parameters).
+
+### Attack Flow
+
+1. Attacker injects malicious script into a request parameter.
+2. Victim clicks a specially crafted link.
+3. The server reflects the payload in the response.
+4. The browser executes the injected script.
+
+### Common Locations
+
+- Search parameters
+- Error messages
+- Form submissions
+- Redirect URLs
+
+### Risk Level
+
+Medium to High (depending on context and user privilege).
 
 ---
 
-## Root Cause
+## 2️⃣ Stored XSS (Persistent XSS)
 
-The vulnerability exists due to improper output encoding and failure to treat user input as untrusted data.
+### Definition
 
-The application does not perform contextual encoding for:
+Stored XSS occurs when malicious input is stored on the server (e.g., database) and later served to users without proper encoding.
 
-- HTML body context
-- Attribute context
+This is more dangerous than Reflected XSS because it does not require user interaction beyond visiting the affected page.
+
+### Attack Flow
+
+1. Attacker submits malicious payload.
+2. The application stores it (e.g., comment, message, profile field).
+3. Other users load the page.
+4. The payload executes automatically.
+
+### Common Locations
+
+- Comment systems
+- Chat messages
+- User profiles
+- Feedback forms
+- Admin dashboards
+
+### Risk Level
+
+High to Critical (especially if executed in admin context).
+
+---
+
+## 3️⃣ DOM-Based XSS
+
+### Definition
+
+DOM-Based XSS occurs when the vulnerability exists entirely on the client side.
+
+The server response itself may be safe, but client-side JavaScript reads user-controlled input and dynamically injects it into the DOM without proper sanitization.
+
+### Key Difference
+
+- Reflected & Stored XSS → Vulnerability originates from server response.
+- DOM XSS → Vulnerability originates from client-side JavaScript logic.
+
+### Attack Flow
+
+1. Attacker manipulates a URL fragment or client-controlled input.
+2. JavaScript processes it.
+3. Data is written to the DOM unsafely.
+4. The payload executes in the browser.
+
+### Common Sources (DOM)
+
+- `document.location`
+- `document.URL`
+- `document.referrer`
+- `window.name`
+
+### Common Sinks
+
+- `innerHTML`
+- `document.write`
+- `eval`
+- `setTimeout(string)`
+- `setInterval(string)`
+
+### Risk Level
+
+Medium to High (depends on execution context).
+
+---
+
+# Impact of XSS
+
+Successful exploitation may allow attackers to:
+
+- Execute arbitrary JavaScript
+- Steal session tokens (if not HttpOnly)
+- Perform actions on behalf of users
+- Modify page content dynamically
+- Conduct phishing attacks within trusted origin
+- Escalate privileges (in chained attacks)
+- Capture sensitive DOM data
+
+Impact severity depends on:
+
+- Cookie configuration (HttpOnly / Secure / SameSite)
+- CSP implementation
+- Victim privilege level
+- Application functionality
+
+---
+
+# Root Causes
+
+XSS vulnerabilities typically occur due to:
+
+- Lack of contextual output encoding
+- Insufficient input validation
+- Unsafe DOM manipulation
+- Absence of Content Security Policy
+- Treating user input as trusted data
+
+---
+
+# Prevention Strategies
+
+Effective mitigation requires a layered defense approach:
+
+### 1️⃣ Contextual Output Encoding
+Encode output depending on context:
+- HTML body
+- HTML attribute
 - JavaScript context
+- URL context
+
+### 2️⃣ Input Validation
+Validate input on server side using strict allowlists.
+
+### 3️⃣ Content Security Policy (CSP)
+Implement strict CSP to reduce exploitation impact.
+
+### 4️⃣ Secure Cookie Configuration
+- HttpOnly
+- Secure
+- SameSite
+
+### 5️⃣ Avoid Dangerous DOM APIs
+Avoid using:
+- innerHTML
+- eval
+- document.write
+
+Use safe alternatives like:
+- textContent
+- createElement
+- setAttribute
 
 ---
 
-## Remediation Strategy
+# Summary Comparison
 
-Recommended defensive measures:
-
-- Context-aware output encoding
-- Strict server-side validation
-- Enforced Content Security Policy (CSP)
-- HttpOnly & Secure cookie flags
-- SameSite cookie configuration
-- Security testing before deployment
+| Type        | Stored on Server | Requires User Interaction | Execution Location | Severity |
+|------------|------------------|--------------------------|-------------------|----------|
+| Reflected  | No               | Yes                      | Server response   | Medium–High |
+| Stored     | Yes              | No                       | Server response   | High–Critical |
+| DOM-Based  | No               | Yes (usually)            | Client-side JS    | Medium–High |
 
 ---
 
-## Evidence
+# Responsible Usage
 
-Sanitized proof-of-execution screenshots are included in this repository.  
-All identifying information has been redacted to protect confidentiality.
+All testing and demonstrations in this repository were conducted in authorized environments.
 
----
-
-## Responsible Disclosure
-
-This finding was identified during authorized testing.  
-No sensitive data or production identifiers are disclosed.
+No production systems or sensitive identifiers are disclosed.
