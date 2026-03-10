@@ -67,7 +67,7 @@ Use **Burp Suite → Engagement Tools → Generate CSRF PoC** to generate a CSRF
 
 Copy the exploit script into the **Exploit Server** and deliver it to the victim.
 
-![Exploit Server](img/csrf-script-(%object)%.png)
+![Exploit Server](img/csrf-script-(object).png)
 
 ---
 
