@@ -38,7 +38,7 @@ This flaw is called **CSRF Token Duplication**.
 
 Launch the lab environment from PortSwigger.
 
-![Start Lab](img/csrf-lab2-token-is-duplicated-in-cookielpng)
+![Start Lab](img/csrf-lab2-token-is-duplicated-in-cookie.png)
 
 ---
 
@@ -59,29 +59,19 @@ Observe that the request contains:
 
 Use **Burp Suite → Engagement Tools → Generate CSRF PoC** to generate a CSRF attack script.
 
-![Generated Script](img/csrf-script-lab2-duplicate-token.png)
+![Generated Script](img/csrf-script-manually.png)
 
 ---
 
-### 4. Modify the Exploit
-
-Edit the generated exploit so it works properly by ensuring the token values match.
-
-The script uses a crafted HTML form to submit the malicious request automatically.
-
-![Manual Script Edit](img/csrfscript-(%object)%.png)
-
----
-
-### 5. Deliver the Exploit Using the Exploit Server
+### 4. Deliver the Exploit Using the Exploit Server
 
 Copy the exploit script into the **Exploit Server** and deliver it to the victim.
 
-![Exploit Server](img/csrf-script-exploit-server.png)
+![Exploit Server](img/csrf-script-(%object)%.png)
 
 ---
 
-### 6. Execute the Attack
+### 5. Execute the Attack
 
 When the victim visits the malicious page, the browser automatically submits the forged request.
 
@@ -89,11 +79,11 @@ Since the server only checks if the tokens match, the request is accepted.
 
 ---
 
-### 7. Lab Solved
+### 6. Lab Solved
 
 After the forged request successfully changes the victim’s email address, the lab is marked as solved.
 
-![Lab Solved](img/csrfsolved-lab-duplicate-token.png)
+![Lab Solved](img/csrf-solved-lab-duplicate-token.png)
 
 ---
 
