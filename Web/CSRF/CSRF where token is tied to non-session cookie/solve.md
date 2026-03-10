@@ -72,7 +72,7 @@ Use **Burp Suite → Engagement Tools → Generate CSRF PoC** to automatically c
 
 The generated script will submit the forged request automatically.
 
-![CSRF Script](img/csrf-script-manually.png)
+![CSRF Script](img/csrf-script-manually-lab1.png)
 
 ---
 
@@ -80,19 +80,12 @@ The generated script will submit the forged request automatically.
 
 Paste the CSRF exploit script into the **Exploit Server** and deliver it to the victim.
 
-![Exploit Server Script](img/csrf-script-manually-in-exploit-server.png)
+![Exploit Server Script](img/csrf-script-manually.png)
 
 ---
 
-### 7. Execute the Attack
 
-Once the victim loads the malicious page, their browser sends the forged request automatically.
-
-![CSRF Attack](img/csrf-lab1.png)
-
----
-
-### 8. Lab Solved
+### 7. Lab Solved
 
 After the forged request successfully changes the email address, the lab is marked as solved.
 
