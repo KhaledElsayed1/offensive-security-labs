@@ -36,7 +36,7 @@ This allows an attacker to **generate a valid CSRF token and trick the victim's 
 
 Begin by launching the lab environment.
 
-![Start Lab](img/start-lab1-csrf-where-token-is-tied-to-non-session.png)
+![Start Lab](img/start-lab-csrf-where-token-is-tied-to-non-session-cookie.png)
 
 ---
 
