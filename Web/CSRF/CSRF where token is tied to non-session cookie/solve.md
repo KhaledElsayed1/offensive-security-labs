@@ -44,7 +44,7 @@ Begin by launching the lab environment.
 
 Login using Carlos's credentials so we can observe the request responsible for updating the email.
 
-![Login Carlos](img/login-carlos-csrf-lab1.png)
+![Login Carlos](img/login-carlos-csrf1.png)
 
 ---
 
