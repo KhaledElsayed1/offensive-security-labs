@@ -90,6 +90,7 @@ The link no longer points to a webpage — it now **executes JavaScript** when c
 
 ---
 
+
 # 🧠 Payload Explanation
 
 ### ✔ Payload Used
@@ -97,7 +98,7 @@ The link no longer points to a webpage — it now **executes JavaScript** when c
 ```
 javascript:alert(document.cookie)
 ```
-
+![solve](6-solved-lab.png)
 ### 🔍 What it does
 
 * The `javascript:` protocol turns an anchor click into script execution.
