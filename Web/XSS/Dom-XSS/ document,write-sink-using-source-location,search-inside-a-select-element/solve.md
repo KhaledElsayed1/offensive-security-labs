@@ -19,7 +19,7 @@ We start the lab and navigate through the application.
 
 Then we open a product page and observe the **stock selector**.
 
-![start](start-dom-xss-document-write.png)
+![start](img/start-dom-xss-document-write.png)
 
 ---
 
@@ -29,7 +29,7 @@ Next, we check the page source using **View Page Source**.
 
 We find a JavaScript snippet that dynamically generates the `<select>` element using `document.write()`.
 
-![source](script-page-source.png)
+![source](img/script-page-source.png)
 
 The script takes the `storeId` (or stock parameter) from the URL using: location.search
 
@@ -46,7 +46,7 @@ We inject a malicious payload into the URL parameter: productId=1&storeId="><svg
 
 The payload breaks out of the `<option>` context and injects an SVG element with a JavaScript event.
 
-![script](script-manually-dom-xss.png)
+![script](img/script-manually-dom-xss.png)
 
 ---
 
@@ -56,13 +56,16 @@ When the page loads, the browser executes the injected payload.
 
 The `onload` event fires and runs the JavaScript `alert(50)`.
 
-![alert](solved-lab.png)
+![alert](img/solved-lab.png)
 
 ---
 
 ## Payload Used
 
-"><svg onload=alert(50)>
+``"><svg onload=alert(50)>``
+## Another Payloads 
+``"><img scr=x onload=alert(34)>
+"><svg onmouseover=alert()>``
 
 
 ---
