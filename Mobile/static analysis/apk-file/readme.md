@@ -196,4 +196,4 @@ This assessment was performed against an intentionally vulnerable application fo
 
 The complete assessment report, including detailed methodology, screenshots, technical evidence, vulnerability descriptions, and remediation recommendations, is available here:
 
-https://github.com/KhaledElsayed1/offensive-security-labs/tree/main/Mobile/static%20analysis/apk-file
+https://github.com/KhaledElsayed1/offensive-security-labs/tree/main/Mobile/static%20analysis/apk-file/Document%203%201.pdf
